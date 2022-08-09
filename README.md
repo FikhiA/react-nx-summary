@@ -27,6 +27,7 @@ Not only does this provide code colocation (all code, all in one place), it can 
 **What's in it for me, then?**
 
 A proper monorepo approach can prevent head-bashing problems and wasted time :)
+
 Even a lot of successful organizations such as Google and Microsoft, and large open source projects like React and Babel use monorepo! Sooo let's just dive right into it!
 
 # Chapter 1: Getting Started with Nx
@@ -48,12 +49,15 @@ If it asks you to install something, just press Y and enter.
 It will look something like this.
 
 For **workspace** name, i will use `zeroone`. and for the preset, pick `react`. 
+
 ![](images/1%20-%201.jpg)
 
 You will be prompted for the **application** name and styling format. Let's use `bookstore` as the app name and `styled-components` for styling.
+
 ![](images/1%20-%202.jpg)
 
 Nx asks you to set up Nx Cloud. It supposedly provides cloud-enhanced features, but we aren't going to worry about that for now.
+
 ![](images/1%20-%203.jpg)
 
 After a couple of moments, Nx should finish creating the workspace, and we will end up with something like this.
@@ -94,7 +98,9 @@ After a couple of moments, Nx should finish creating the workspace, and we will 
 
 ---
 
-The `apps` folder contains the code of all apps, which 2 was created by default right now: The `bookstore` app and its Cypress end-to-end (e2e) tests.
+The `apps` folder contains the code of all apps, inside of which 2 has been created by default right now: 
+- The `bookstore` app, and 
+- Its end-to-end (e2e) tests using Cypress.
 
 The `libs` folder contains our libraries, currently empty.
 
@@ -102,14 +108,12 @@ The `tools` folder can be used for scripts that are workspace-specific.
 
 The `nx.json` file configures Nx.
 
-<br>
-Aaand to start the app, use:
-
-`$ npm start`
+Aaand to start the app, type in `npm start` to the terminal.
 
 This will start the `bookstore` app and you can open it at [http://localhost:4200](http://localhost:4200) 
 
 We are greeted with a welcome page, yaay!
+
 ![](images/1%20-%204.jpg)
 
 Great job on following along this far! if you want to read more about Nx workspace config, click below! (might require quite a bit of knowledge, be warned ._. )

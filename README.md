@@ -100,7 +100,7 @@ After a couple of moments, Nx should finish creating the workspace, and we will 
 
 The `apps` folder contains the code of all apps, inside of which 2 has been created by default right now: 
 - The `bookstore` app, and 
-- Its end-to-end (e2e) tests using Cypress.
+- `bookstore-e2e`, which is its end-to-end (e2e) tests using Cypress.
 
 The `libs` folder contains our libraries, currently empty.
 
@@ -116,20 +116,154 @@ We are greeted with a welcome page, yaay!
 
 ![](images/1%20-%204.jpg)
 
-Great job on following along this far! if you want to read more about Nx workspace config, click below! (might require quite a bit of knowledge, be warned ._. )
+Great job on following along this far! if you want to read more about advanced Nx stuff, click below! 
+(might require quite a bit of knowledge though, be warned ._. )
+
+Or else you can just skip them :)
 
 <details>
-<summary>Nx Workspace configs</summary>
+<summary><b>Nx Workspace Configs</b></summary>
 
-TODO
+Nx is built in a modular fashion, and gives you a lot of foundation such as dependency graph calculation, running generators and migrations, computation caching, and also a set of plugins to provide technology specific features, which provides you to gradually dive deeper into Nx features.
+
+Nx provides specific config files:
+- `nx.json` which is at the root of the workspace and to configure Nx CLI (set defaults for projects and code scaffolding, workspace layout, task runner, and computation cache configs)
+- `workspace.json` is also at the root of the workspace is optional and can be used to list the projects in your workspace explicitly, instead of having Nx scan it for you.
+- `project.json` is at the root of every project, which contains specific metadata and "targets" or tasks that can be ran on the project. Such as `build`, `serve`, `lint`, `test` and can be configured however you see fit.
+
+</details>
+
+<details>
+<summary><b>Nx Commands</b></summary>
+
+"Targets" mentioned in the previous section can be invoked or ran with `nx [target] [project]`
+
+For example, in our `bookstore` app, we can run these targets.
+
+```
+# Serve the app
+npx nx serve bookstore
+
+# Build the app
+npx nx build bookstore
+
+# Run a linter for the application
+npx nx lint bookstore
+
+# Run unit tests for the application
+npx nx test bookstore
+
+# Run e2e tests for the application
+npx nx e2e bookstore-e2e
+
+# You can also see the dependecy graph of our workspace
+npx nx dep-graph
+```
+
+Give it a try!
+
+</details>
+
+<details>
+<summary><b>Installing Nx globally</b></summary>
+
+If you don't want to type in `npx` for every command, you can install Nx globally with 
+
+`npm install -g @nrwl/cli`
+
+And check that it installed properly with `nx --version`
+
+So, next time you run a command, you only need to type in `nx ...` without the `npx`.
 
 </details>
 
 ---
 
+## Preparing for Development
+
+Let's end this chapter by removing the generated content from the `bookstore` app and adding some configs to the workspace.
+
+Open up your favorite code editor and modify these three files.
+
+**apps/bookstore/src/app/app.tsx**
+```
+import styled from 'styled-components';
+
+const StyledApp = styled.div``;
+
+export const App = () => {
+  return (
+    <StyledApp>
+      <header>
+        <h1>Bookstore</h1>
+      </header>
+    </StyledApp>
+  );
+}
+
+export default App;
+```
+
+**apps/bookstore/src/app/app.spec.tsx**
+```
+import { getGreeting } from '../support/app.po';
+
+describe('bookstore', () => {
+  beforeEach(() => cy.visit('/'));
+
+  it('should display welcome message', () => {
+    getGreeting().contains('Bookstore');
+  });
+});
+```
+
+**apps/bookstore-e2e/src/integration/app.spec.ts**
+```
+import { getGreeting } from '../support/app.po';
+
+describe('bookstore', () => {
+  beforeEach(() => cy.visit('/'));
+
+  it('should display welcome message', () => {
+    getGreeting().contains('Bookstore');
+  });
+});
+```
+
+Make sure the tests still pass:
+- `nx lint bookstore`
+- `nx test bookstore`
+- `nx e2e bookstore-e2e`
+
+If you serve the app again ([at http://localhost:4200](http://localhost:4200)) you will end up with something like this: 
+
+![](images/1%20-%205.jpg)
+
+It's a bookstore alright. Might not look great, but hey, you made some progress!
+
+Also, it's a good idea to commit your code before making any more changes. So you can keep track of your progress and can rollback if anything goes south :D
+
+```
+git add .
+git commit -m 'end of chapter one'
+```
+
+**Summary:**
+
+A typical Nx *workspace* consists of two types of projects: *applications* and *libraries*.
+
+A newly created workspace comes with a set of targets we can run on the generated application: `lint`, `test`, and `e2e`.
+
+Nx also has a tool for displaying the *dependency graph* of all the projects within the workspace.
+
 # Chapter 2: Libraries
 
-TODO
+Now that we have a skeleton of the app, we can start adding to our app by creating and using *libraries*!
+Before that though, let's understand a little more about the concept of libraries.
+
+## Apps and Libs
+
+As alluded to before, a typical Nx workspace contains "apps" and "libs". This separation helps
 
 # Chapter 3: Working Effectively in Monorepo
 

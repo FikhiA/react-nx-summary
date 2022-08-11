@@ -556,13 +556,282 @@ Let's go over what each component does.
 
 ## GlobalStyles
 
+This component will inject a global stylesheet (css) into the app when used. Can be useful to override global style rules like `body { margin 0; }`
+
+**libs/ui/src/lib/global-styles/global-styles.tsx**
+
+```
+import { createGlobalStyle } from 'styled-components';
+
+export const GlobalStyles = createGlobalStyle`
+  body {
+    margin: 0;
+    font-size: 16px;
+    font-family: sans-serif;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+`;
+
+export default GlobalStyles;
+```
+
 ## Button
+
+It's a styled button. It does what it says and passes props down to the actual \<button\> element.
+
+**libs/ui/src/lib/button/button.tsx**
+
+```
+import { ButtonHTMLAttributes } from 'react';
+import styled from 'styled-components';
+
+const StyledButton = styled.button`
+  font-size: 0.8rem;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  background-color: #fafafa;
+  border-radius: 4px;
+
+  &:hover {
+    background-color: #80a8e2;
+    border-color: #0e2147;
+  }
+`;
+
+export const Button = ({
+  children,
+  ...rest
+}: ButtonHTMLAttributes<HTMLButtonElement>) => {
+  return <StyledButton {...rest}>{children}</StyledButton>;
+};
+
+export default Button;
+```
 
 ## Header and Main
 
+These are used for layout. Header component is the header bar, and the Main takes up the rest of the page.
+
+**libs/ui/src/lib/header/header.tsx**
+
+```
+import { HTMLAttributes } from 'react';
+import styled from 'styled-components';
+
+const StyledHeader = styled.div`
+  padding: 1rem;
+  background-color: #2657ba;
+  color: white;
+  display: flex;
+  align-items: center;
+  a {
+    color: white;
+    text-decoration: none;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+  > h1 {
+    margin: 0 1rem 0 0;
+    padding-right: 1rem;
+    border-right: 1px solid white;
+  }
+`;
+
+export const Header = (props: HTMLAttributes<HTMLElement>) => (
+  <StyledHeader>{props.children}</StyledHeader>
+);
+
+export default Header;
+```
+
+**libs/ui/src/lib/main/main.tsx**
+
+```
+import { HTMLAttributes } from 'react';
+import styled from 'styled-components';
+
+const StyledMain = styled.main`
+  padding: 0 1rem;
+  width: 100%;
+  max-width: 960px;
+`;
+
+export const Main = (props: HTMLAttributes<HTMLElement>) => (
+  <StyledMain>{props.children}</StyledMain>
+);
+
+export default Main;
+```
+
 ## NavigationList and NavigationItem
 
+And lastly, NavigationList will render the navbar inside Header component, and NavigationItem will render items inside NavigationList.
+
+**libs/ui/src/lib/navigation-list/navigation-list.tsx**
+
+```
+import { HTMLAttributes } from 'react';
+import styled from 'styled-components';
+
+const StyledNavigationList = styled.div`
+  ul {
+    display: flex;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+`;
+
+export const NavigationList = (props: HTMLAttributes<HTMLElement>) => {
+  return (
+    <StyledNavigationList role="navigation">
+      <ul>{props.children}</ul>
+    </StyledNavigationList>
+  );
+};
+
+export default NavigationList;
+```
+
+**libs/ui/src/lib/navigation-item/navigation-item.tsx**
+
+```
+import { LiHTMLAttributes } from 'react';
+import styled from 'styled-components';
+
+const StyledNavigationItem = styled.li`
+  margin-right: 1rem;
+`;
+
+export const NavigationItem = (props: LiHTMLAttributes<HTMLLIElement>) => {
+  return <StyledNavigationItem>{props.children}</StyledNavigationItem>;
+};
+
+export default NavigationItem;
+```
+
 ## Using the UI Libs
+
+Now we can use the libs inside our `bookstore` app.
+
+```
+import { Link, Redirect, Route } from 'react-router-dom';
+import { BooksFeature } from '@zeroone/books/feature';
+
+// importing the UI library into our App
+import {
+  GlobalStyles,
+  Header,
+  Main,
+  NavigationItem,
+  NavigationList
+} from '@zeroone/ui';
+
+export const App = () => {
+  return (
+    <>
+      <GlobalStyles />
+      <Header>
+        <h1>Bookstore</h1>
+        <NavigationList>
+          <NavigationItem>
+            <Link to="/books">Books</Link>
+          </NavigationItem>
+        </NavigationList>
+      </Header>
+      <Main>
+        <Route path="/books" component={BooksFeature} />
+        <Route exact path="/" render={() => <Redirect to="/books" />} />
+      </Main>
+    </>
+  );
+};
+
+export default App;
+```
+
+Finally, let's restart our server (`npx nx serve bookstore`) and we will see the improved UI! :D
+
+![](images/1%20-%207.5.jpg)
+
+Looks great! Let's save our progress.
+
+```
+git add .
+git commit -m 'add books feature and ui components'
+```
+
+## Data-access Libs
+
+We want to fetch data from *somewhere* and display it to our books feature. And to do that, we need a data-access lib.
+
+`npx nx g @nrwl/web:lib data-access --directory books --tags type:data-access,scope:books`
+
+**What is that `@nrwl/web:lib` doing? why not just `lib` ?**
+
+Because we want to run it in web browser, and not necessarily in React or any specific framework. So we specifically use the `lib` generator from `@nrwl/web`.
+
+We previously not use any prefix because inside `nx.json`, `@nrwl/react` *is* the default generator.
+
+Back on track, a new directory popped up, again! :D
+
+Let's open and edit the books-data-access.tsx file.
+
+**libs/books/data-access/src/lib/books-data-access.ts**
+
+```
+export async function getBooks() {
+  // TODO: We'll wire this up to an actual API later.
+  // For now we are just returning some fixtures.
+  return [
+    {
+      id: 1,
+      title: 'The Picture of Dorian Gray',
+      author: 'Oscar Wilde',
+      rating: 3,
+      price: 9.99
+    },
+    {
+      id: 2,
+      title: 'Frankenstein',
+      author: 'Mary Wollstonecraft Shelley',
+      rating: 5,
+      price: 7.95
+    },
+    {
+      id: 3,
+      title: 'Jane Eyre',
+      author: 'Charlotte Brontë',
+      rating: 4,
+      price: 10.95
+    },
+    {
+      id: 4,
+      title: 'Dracula',
+      author: 'Bram Stoker',
+      rating: 5,
+      price: 14.99
+    },
+    {
+      id: 5,
+      title: 'Pride and Prejudice',
+      rating: 4,
+      author: 'Jane Austen',
+      price: 12.85
+    }
+  ];
+}
+
+export default getBooks;
+```
+
+## Using the data-access lib
+
+
 
 # Chapter 3: Working Effectively in Monorepo
 

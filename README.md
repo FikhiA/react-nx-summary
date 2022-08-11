@@ -32,6 +32,8 @@ A proper monorepo approach can prevent head-bashing problems and wasted time :)
 
 Even Google, Microsoft and React use monorepo! Sooo let's just dive right into it!
 
+<br>
+
 # Chapter 1: Getting Started with Nx
 
 Before we go anywhere, let's define some things first. 😀
@@ -119,27 +121,9 @@ We are greeted with a welcome page, yaay! 🥳
 
 ![](images/1%20-%204.jpg)
 
-If you want to read more about advanced Nx stuff, click below! 
-(might require quite a bit of knowledge though, be warned ._. )
+## Nx Commands
 
-Or else you can just skip them :)
-
-<details>
-<summary><b>Nx Workspace Configs</b></summary>
-
-Nx is built in a modular fashion, and gives you a lot of foundation such as dependency graph calculation, running generators and migrations, computation caching, and also a set of plugins to provide technology specific features, which provides you to gradually dive deeper into Nx features.
-
-Nx provides specific config files:
-- `nx.json` which is at the root of the workspace and to configure Nx CLI (set defaults for projects and code scaffolding, workspace layout, task runner, and computation cache configs)
-- `workspace.json` is also at the root of the workspace is optional and can be used to list the projects in your workspace explicitly, instead of having Nx scan it for you.
-- `project.json` is at the root of every project, which contains specific metadata and "targets" or tasks that can be ran on the project. Such as `build`, `serve`, `lint`, `test` and can be configured however you see fit.
-
-</details>
-
-<details>
-<summary><b>Nx Commands</b></summary>
-
-"Targets" mentioned in the previous section can be invoked or ran with `nx [target] [project]`
+Targets are tasks or commands that can be invoked or ran on the project. Call it with `nx [target] [project]`!
 
 For example, in our `bookstore` app, we can run these targets.
 
@@ -164,6 +148,27 @@ npx nx dep-graph
 ```
 
 Give it a try!
+
+**Hold on a sec, what is npx? do you mean npm?**
+
+Noo, it is not a typo :)
+
+`npx` is a way to run scripts, and since Nx generators are basically scripts, you use `npx`. You can also install Nx globally if you are annoyed of typing npx everytime🤣
+
+If you want to read more about advanced Nx stuff, click below! 
+(might require quite a bit of knowledge though, be warned ._. )
+
+Or else you can just skip them :)
+
+<details>
+<summary><b>Nx Workspace Configs</b></summary>
+
+Nx is built in a modular fashion, and gives you a lot of foundation such as dependency graph calculation, running generators and migrations, computation caching, and also a set of plugins to provide technology specific features, which provides you to gradually dive deeper into Nx features.
+
+Nx provides specific config files:
+- `nx.json` which is at the root of the workspace and to configure Nx CLI (set defaults for projects and code scaffolding, workspace layout, task runner, and computation cache configs)
+- `workspace.json` is also at the root of the workspace is optional and can be used to list the projects in your workspace explicitly, instead of having Nx scan it for you.
+- `project.json` is at the root of every project, which contains specific metadata and "targets" or tasks that can be ran on the project. Such as `build`, `serve`, `lint`, `test` and can be configured however you see fit.
 
 </details>
 
@@ -234,9 +239,9 @@ describe('bookstore', () => {
 ```
 
 Make sure the tests still pass:
-- `nx lint bookstore`
-- `nx test bookstore`
-- `nx e2e bookstore-e2e`
+- `npx nx lint bookstore`
+- `npx nx test bookstore`
+- `npx nx e2e bookstore-e2e`
 
 If you serve the app again ([at http://localhost:4200](http://localhost:4200)) you will end up with something like this: 
 
@@ -341,7 +346,7 @@ You can generate new apps, components, libs, and more using `nx generate` or its
 So, let's try creating one!
 
 ```
-nx g lib feature \
+npx nx g lib feature \
 --directory books \
 --appProject bookstore \
 --tags type:feature,scope:books
@@ -356,7 +361,208 @@ Calm down, i will explain it.
 - `--appProject` tells Nx to put it into the `bookstore` app. This will help you generate routes, adding `BrowserRouter` and adding `react-router-dom`, auto*magically*✨.
 - `--tags` lets you annotate apps and libs, and can be used to scope or constrain usage, we will see it later.
 
+After it completes, you will see the new directory.
 
+```
+.
+├── (...)
+├── libs
+│ └── books
+│ └── feature
+│ ├── src
+│ │ ├── index.ts
+│ │ └── lib
+│ ├── jest.config.js
+│ ├── project.json
+│ ├── README.md
+│ ├── tsconfig.json
+│ ├── tsconfig.lib.json
+│ └── tsconfig.spec.json
+└── (...)
+```
+
+Nx generates our library with some default code and its scaffolding for linting (ESLint) and testing (Jest). Try running them with
+
+```
+npx nx lint books-feature
+npx nx test books-feature
+```
+
+Oh yeah, did you notice that? Nx actually helps you scope the libs! books(directory) - feature(category)
+
+Anyway, Nx also updates the `bookstore`'s App component in `apps/bookstore/src/app/app.tsx` auto*magically*! :D
+
+<details>
+<summary><b>apps/bookstore/src/app/app.tsx</b></summary>
+
+```
+import styled from 'styled-components';
+
+import { Route, Link } from 'react-router-dom';
+
+import { BooksFeature } from '@zeroone/books/feature';
+
+const StyledApp = styled.div``;
+
+export const App = () => {
+  return (
+    <StyledApp>
+      <header>
+        <h1>Bookstore</h1>
+      </header>
+      {/* START: routes */}
+      {/* These routes and navigation have been generated for you */}
+      {/* Feel free to move and update them to fit your needs */}
+      <br />
+      <hr />
+      <br />
+      <div role="navigation">
+        <ul>
+          <li>
+            <Link to="/">Home</Link>
+          </li>
+          <li>
+            <Link to="/feature">BooksFeature</Link>
+          </li>
+          <li>
+            <Link to="/page-2">Page 2</Link>
+          </li>
+        </ul>
+      </div>
+      <Route
+        path="/"
+        exact
+        render={() => (
+          <div>
+            This is the generated root route.{' '}
+            <Link to="/page-2">Click here for page 2.</Link>
+          </div>
+        )}
+      />
+      <Route path="/feature" component={BooksFeature} />
+      <Route
+        path="/page-2"
+        exact
+        render={() => (
+          <div>
+            <Link to="/">Click here to go back to root page.</Link>
+          </div>
+        )}
+      />
+      {/* END: routes */}
+    </StyledApp>
+  );
+};
+
+export default App;
+```
+
+</details>
+
+---
+
+The `main.tsx` is updated as well!
+
+<details>
+<summary><b>apps/bookstore/src/main.tsx</b></summary>
+
+```
+import { StrictMode } from 'react';
+import * as ReactDOM from 'react-dom';
+
+import App from './app/app';
+
+import { BrowserRouter } from 'react-router-dom';
+
+ReactDOM.render(
+  <StrictMode>
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
+  </StrictMode>,
+  document.getElementById('root')
+);
+
+export default App;
+```
+
+</details>
+
+---
+
+Try restarting the development server again (`npx nx serve bookstore`), and you will see the updated app!
+
+![](images/1%20-%206.jpg)
+
+![](images/1%20-%207.jpg)
+
+Uhhhh alright, it has some style to it. Not good enough though. So let's add a component lib to provide better styles, eh?
+
+## UI Libraries
+
+```
+npx nx g lib ui \
+--tags type:ui,scope:books \
+--no-interactive
+```
+
+Again, we will create a `ui` library with these tags, and `--no-interactive` simply means "don't ask me anything, use the default."
+
+Oh, a new folder popped up (～￣▽￣)～ (at `libs/ui`).
+
+```
+zeroone
+├── (...)
+├── libs
+│ ├── (...)
+│ ├── ui
+│ │ ├── src
+│ │ │ ├── lib
+│ │ │ └── index.ts
+│ │ ├── .eslintrc
+│ │ ├── jest.config.js
+│ │ ├── README.md
+│ │ ├── tsconfig.app.json
+│ │ ├── tsconfig.json
+│ │ └── tsconfig.spec.json
+└── (...)
+```
+
+It does nothing yet, so let's add some components!
+
+```
+npx nx g component GlobalStyles --project ui --export --tags type:ui,scope:books
+
+npx nx g component Button --project ui --export --tags type:ui,scope:books
+
+npx nx g component Header --project ui --export --tags type:ui,scope:books
+
+npx nx g component Main --project ui --export --tags type:ui,scope:books
+
+npx nx g component NavigationList --project ui --export --tags type:ui,scope:books
+
+npx nx g component NavigationItem --project ui --export --tags type:ui,scope:books
+```
+
+That was a lot. Let me explain.
+
+We created a couple of components (GlobalStyles, Button, Header, etc.) inside the `ui` project, exported it to `index.ts`, and with specified tags.
+
+The `--exports` isn't strictly necessary, though. If you forgot about it, you can add it manually into the `index.ts`.
+
+If you want to mess around and learn more about the Nx commands, try adding `--help` like `npx nx g component --help`, or `npx nx g app --help`
+
+Let's go over what each component does.
+
+## GlobalStyles
+
+## Button
+
+## Header and Main
+
+## NavigationList and NavigationItem
+
+## Using the UI Libs
 
 # Chapter 3: Working Effectively in Monorepo
 

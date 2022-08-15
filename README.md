@@ -1521,7 +1521,7 @@ And change these five files to use the new model:
 **apps/api/src/main.ts**
 
 ```js
-import { IBook } from '@acme/shared-models';
+import { IBook } from '@zeroone/shared-models';
 // ...
 
 app.get('/api/books', (req, res) => {
@@ -1537,7 +1537,7 @@ app.get('/api/books', (req, res) => {
 **libs/books/data-access/src/lib/books-data-access.ts**
 
 ```js
-import { IBook } from '@acme/shared-models';
+import { IBook } from '@zeroone/shared-models';
 
 // Add correct type for the return value
 export async function getBooks(): Promise<IBook[]> {
@@ -1550,7 +1550,7 @@ export async function getBooks(): Promise<IBook[]> {
 
 ```js
 // ...
-import { IBook } from '@acme/shared-models';
+import { IBook } from '@zeroone/shared-models';
 
 export const BooksFeature = () => {
   // Properly type the array
@@ -1571,7 +1571,7 @@ export default BooksFeature;
 
 ```js
 // ...
-import { IBook } from '@acme/shared-models';
+import { IBook } from '@zeroone/shared-models';
 // Replace any with IBook
 export interface BooksProps {
   books: IBook[];
@@ -1587,7 +1587,7 @@ export default Books;
 
 ```js
 // ...
-import { IBook } from '@acme/shared-models';
+import { IBook } from '@zeroone/shared-models';
 
 // Replace any with IBook
 export interface BookProps {
@@ -1688,7 +1688,7 @@ And then provide a `checkout` function to use in our feature.
 **libs/cart/data-access/src/lib/cart-data-access.ts**
 
 ```js
-import { ICart } from '@acme/shared-models';
+import { ICart } from '@zeroone/shared-models';
 
 export async function checkout(cart: ICart): Promise<{ sucess: boolean }> {
   const data = await fetch('/api/checkout', {

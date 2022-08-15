@@ -143,7 +143,7 @@ npx nx test bookstore
 # Run e2e tests for the application
 npx nx e2e bookstore-e2e
 
-# You can also see the dependecy graph of our workspace
+# You can also see the dependency graph of our workspace
 npx nx dep-graph
 ```
 
@@ -256,7 +256,7 @@ git add .
 git commit -m 'end of chapter one'
 ```
 
-**Summary:**
+## Summary:
 
 A typical Nx *workspace* consists of two types of projects: *applications* and *libraries*.
 
@@ -1123,7 +1123,7 @@ We have created a `bookstore` app that lists books for users to purchase. Now we
 
 ## The Dependency Graph
 
-As we've seen, Nx can generate a dependecy graph. Let's look at it now! 
+As we've seen, Nx can generate a dependency graph. Let's look at it now! 
 
 `npx nx dep-graph`
 
@@ -1137,6 +1137,476 @@ Let's say we add a checkout button to each books in the list. Let's update our `
 
 **libs/books/ui/src/lib/book/book.tsx**
 
+```
+import styled from 'styled-components';
+import { Button } from '@zeroone/ui';
+
+/* eslint-disable-next-line */
+export interface BookProps {
+  book: any;
+  // new prop
+  onAdd: (book: any) => void;
+}
+
+const StyledBook = styled.div`
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #ccc;
+  &:last-child {
+    border-bottom: none;
+  }
+  > span {
+    padding: 1rem 0.5rem;
+    margin-right: 0.5rem;
+  }
+  .title {
+    flex: 1;
+  }
+  .rating {
+    color: #999;
+  }
+  .price {
+    color: #478d3c;
+  }
+`;
+
+export const Book = ({ book, onAdd }: BookProps) => {
+  const handleAdd = () => onAdd(book);
+  return (
+    <StyledBook>
+      <span className="title">
+        {book.title} by <em>{book.author}</em>
+      </span>
+      <span className="rating">{book.rating}</span>
+      <span className="price">${book.price}</span>
+      {/* Add button to UI */}
+      <span>
+        <Button onClick={handleAdd}>Add to Cart</Button>
+      </span>
+    </StyledBook>
+  );
+};
+
+export default Book;
+```
+
+**libs/books/ui/src/lib/books/books.tsx**
+
+```
+import styled from 'styled-components';
+import { Book } from '../book/book';
+
+export interface BooksProps {
+  books: any[];
+  // New prop
+  onAdd: (book: any) => void;
+}
+
+const StyledBooks = styled.div`
+  border: 1px solid #ccc;
+  border-radius: 4px;
+`;
+
+export const Books = ({ books, onAdd }: BooksProps) => {
+  return (
+    <StyledBooks>
+      {books.map((book) => (
+        // Pass down new callback prop
+        <Book key={book.id} book={book} onAdd={onAdd} />
+      ))}
+    </StyledBooks>
+  );
+};
+
+export default Books;
+```
+
+**libs/books/feature/src/lib/books-feature.tsx**
+
+```
+import { useEffect, useState } from 'react';
+import styled from 'styled-components';
+import { getBooks } from '@zeroone/books/data-access';
+import { Books } from '@zeroone/books/ui';
+
+export const BooksFeature = () => {
+  const [books, setBooks] = useState<any[]>([]);
+  useEffect(
+    () => {
+      getBooks().then(setBooks);
+    },
+    [
+      // This effect runs only once on first component render
+      // so we declare it as having no dependent state.
+    ]
+  );
+  return (
+    <>
+      <h2>Books</h2>
+      {/* Pass a stub callback for now */}
+      {/* We'll implement this properly in Chapter 4 */}
+      <Books books={books} onAdd={(book) => alert(`Added ${book.title}`)} />
+    </>
+  );
+};
+export default BooksFeature;
+```
+
+Nx not only understands how projects relate, but can also determine which projects were affected by a change. We can see this by prepending "affected" to a command.
+
+`npx nx affected:dep-graph`
+
+![](images/1%20-%2010.jpg)
+
+Any projects dependent on the change is highlighted in red. Welp, i think i changed everything. Oh well.
+
+But there is **more**. We can also use other commands only against the affected projects. So we can only re-test, re-lint or re-build what's changed.
+
+```
+// build only the affected apps
+npx nx affected:build
+// run unit tests on affected projects
+npx nx affected:test
+// run linting on affected projects
+npx nx affected:lint
+// run e2e tests on affected projects
+npx nx affected:e2e
+// Lists affected apps
+npx nx affected:apps
+// Lists affected libs
+npx nx affected:libs
+```
+
+Nx runs these tasks in parallel to make it run blazing fast ⚡
+
+You can set the amount of parallel tasks using `--maxParallel` flag. (3 by default)
+
+Also, the `affected:*` command compares HEAD to a branch, `main` by default. You can set it by passing `--base` flag, or setting `defaultBase` in nx.json.
+
+Uhhh, you might have tried testing the changes and they broke. I'm not going to judge you for it. You might want to fix it, but i won't 😎
+
+## Computation Caching
+
+When you adopt a monorepo and the size grows, you have to think about scaling. Re-building an entire whackload of code every single time might not be time-efficient to say the least.
+
+So, Nx uses a computation cache. Basically, if you run any task, Nx will **remember** it. If nothing really changed next time you run the same command, it will just spit the same output, almost instantly.
+
+By "nothing really changed" i mean its affected source files, deps, configs, versions, runtime values, or CLI flags. 
+
+![Technical jibber-jabber](images/computation-cache.jpg)
+
+You can customize it for specific needs, like linting only checks source code and configs.
+
+Try running unit tests for `books-feature`. Run it twice, and you will see that you will fail the second time, blazingly fast 😎⚡
+
+The cache is stored in `node_modules/.cache/nx` folder. You can configure it in `nx.json`, under `taskRunnerOptions` field.
+
+But not only locally, Nx can also store the cache remotely using Nx Cloud. Oh, so **that's** what it's about.
+
+![](images/nx-cloud-cache.jpg)
+
+Basically, if somebody else fails a unit test on the same code.. you will also fail, but **faster**. 😂
+
+## Adding the API App
+
+Now let's get practical again. Commit your changes because it's about to get real. 
+
+```
+git add .
+git commit -m 'added checkout button'
+```
+
+So far, our `bookstore` app has not communicated with a backend service. Let's make one using Express.
+
+Install the `@nrwl/express` collection first.
+
+`npm install --save-dev @nrwl/express`
+
+Then, run it!
+
+```
+npx nx g @nrwl/express:app api \
+--no-interactive \
+--frontend-project=bookstore \
+```
+
+`--frontend-project` will add a proxy config to the `bookstore` app so requests to `/api/*` will be forwarded to the API.
+
+Let's start it!
+
+`npx nx serve api`
+
+Open [http://localhost:3333/api](http://localhost:3333/api) or [http://localhost:4200/api](http://localhost:4200/api) and see it in action!
+
+![](images/1%20-%2012.jpg)
+
+Nice, it works! Let's implement `/api/books` to use it in our data-access lib.
+
+**apps/api/src/main.ts**
+
+```
+/**
+ * This is not a production server yet!
+ * This is only a minimal backend to get started.
+ */
+
+import * as express from 'express';
+import { IBook, ICart } from '@zeroone/shared-models';
+import path = require('path');
+
+const app = express();
+
+app.get('/api', (req, res) => {
+  res.send({ message: 'Welcome to api!' });
+});
+
+app.get('/api/books', (req, res) => {
+  const books: IBook[] = [
+    {
+      id: 1,
+      title: 'The Picture of Dorian Gray ',
+      author: 'Oscar Wilde',
+      rating: 5,
+      price: 9.99,
+    },
+    {
+      id: 2,
+      title: 'Frankenstein',
+      author: 'Mary Wollstonecraft Shelley',
+      rating: 4,
+      price: 7.95,
+    },
+    {
+      id: 3,
+      title: 'Jane Eyre',
+      author: 'Charlotte Brontë',
+      rating: 4.5,
+      price: 10.95,
+    },
+    {
+      id: 4,
+      title: 'Dracula',
+      author: 'Bram Stoker',
+      rating: 4,
+      price: 14.99,
+    },
+    {
+      id: 5,
+      title: 'Pride and Prejudice',
+      author: 'Jane Austen',
+      rating: 4.5,
+      price: 12.85,
+    },
+  ];
+  res.send(books);
+});
+
+app.post('/api/checkout', (req, res) => {
+  const cart: ICart = req.body;
+  console.log('Checking out...', JSON.stringify(cart, null, 2));
+  res.send({ order: '12345678' });
+  });
+
+const port = process.env.port || 3333;
+const server = app.listen(port, () => {
+  console.log(`Listening at http://localhost:${port}/api`);
+});
+
+// Serve built frontend app
+app.use(express.static(path.join(__dirname, '../bookstore')))
+// Handle browser-side routes
+app.get('*', function(req, res) {
+res.sendFile('index.html', {root: path.join(__dirname, '../bookstore')});
+});
+
+server.on('error', console.error);
+```
+
+And let's update our data-access lib.
+
+**libs/books/data-access/src/lib/books-data-access.ts**
+
+```
+import { IBook } from '@zeroone/shared-models';
+
+export async function getBooks() {
+  const data = await fetch('/api/books', {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+  return data.json();
+}
+export default getBooks;
+```
+
+Then, restart both apps. (`npx nx serve api` and `npx nx serve bookstore`), or... 
+
+protip: run both! Use `npx nx run-many --target=serve --projects=api,bookstore`
+
+We will see that our app still works! (hopefully...) and we can verify that `/api/books` is being called.
+
+![](images/1%20-%2013.jpg)
+
+Commit it because it works!
+
+```
+git add .
+git commit -m 'added api app'
+```
+
+## Sharing Models between Frontend and Backend
+
+We've been using `any` types, this is a bad practice as it may lead to uncaught type errors in production :(
+
+A better idea is to create a utility lib with shared models!
+
+`npx nx g @nrwl/node:lib shared-models --no-interactive`
+
+**libs/shared-models/src/lib/shared-models.ts**
+
+```
+export interface IBook {
+  id: number;
+  title: string;
+  author: string;
+  rating: number;
+  price: number;
+}
+```
+
+And change these five files to use the new model:
+
+**apps/api/src/main.ts**
+
+```
+import { IBook } from '@acme/shared-models';
+// ...
+
+app.get('/api/books', (req, res) => {
+  const books: IBook[] = [
+  // ...
+  ];
+  res.send(books);
+});
+
+// ...
+```
+
+**libs/books/data-access/src/lib/books-data-access.ts**
+
+```
+import { IBook } from '@acme/shared-models';
+
+// Add correct type for the return value
+export async function getBooks(): Promise<IBook[]> {
+  const data = await fetch('http://localhost:3333/api/books');
+  return data.json();
+}
+```
+
+**libs/books/feature/src/lib/books-feature.tsx**
+
+```
+// ...
+import { IBook } from '@acme/shared-models';
+
+export const BooksFeature = () => {
+  // Properly type the array
+  const [books, setBooks] = useState<IBook[]>([]);
+  // ...
+  return (
+    <>
+      <h2>Books</h2>
+      <Books books={books} onAdd={book => alert(`Added ${book.title}`)} />
+    </>
+  );
+};
+
+export default BooksFeature;
+```
+
+**libs/books/ui/src/lib/books/books.tsx**
+
+```
+// ...
+import { IBook } from '@acme/shared-models';
+// Replace any with IBook
+export interface BooksProps {
+  books: IBook[];
+  onAdd: (book: IBook) => void;
+}
+
+// ...
+
+export default Books;
+```
+
+**libs/books/ui/src/lib/book/book.tsx**
+
+```
+// ...
+import { IBook } from '@acme/shared-models';
+
+// Replace any with IBook
+export interface BookProps {
+  book: IBook;
+  onAdd: (book: IBook) => void;
+}
+
+// ...
+
+export default Book;
+```
+
+Run dep-graph again and you will see something like this.
+
+![](images/1%20-%2014.jpg)
+
+Using Nx, we created a shared model lib and refactored both sides blazingly fast😎
+
+...ok i should stop using that word
+
+Anyway, we can also check these changes in a single commit!
+
+```
+git add .
+git commit -m 'add shared models'
+```
+
+## Automatic Code Formatting
+
+You can waste hours fighting over what style to use in a code. To not waste time, we use Prettier to enforce code styles, automatically. Nx uses Prettier from the get-go.
+
+```
+// Checks for format conformance with Prettier.
+// Exits with error code when the check fails.
+nx format:check
+// Formats files with Prettier.
+nx format:write
+```
+
+## Summary:
+
+- Nx understands dependency of all our projects within a workspace.
+- Nx can show projects affected by a change, and also retest and rebuild only what's changed.
+- Using a monorepo, related changes in different projects stay inside a commit or pull-request, which gives a full picture of the changes.
+- Nx uses Prettier to format our code automatically.
+
 # Chapter 4: Bringing it all together
 
-TODO
+We have seen how to generate and organize our React apps, libs, and Express app. We will implement a checkout feature now.
+
+## Checkout API and Shared Models
+
+## Cart data-access Lib
+
+## Managing cart State using Redux Toolkit
+
+I don't really understand this. So may god help you.
+
+## Cart feature Lib
+
+## Wiring up Add Button in books Feature
+
+## Building for Production

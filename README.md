@@ -831,11 +831,311 @@ export default getBooks;
 
 ## Using the data-access lib
 
+Now let's use the `getBooks` function in out `books` feature. We can do this using `useEffect` and `useState`.
 
+**libs/books/feature/src/lib/books-feature.tsx**
+
+```
+import { useEffect, useState } from 'react';
+import styled from 'styled-components';
+import { getBooks } from '@zeroone/books/data-access';
+import { Books } from '@zeroone/books/ui';
+
+export const BooksFeature = () => {
+  const [books, setBooks] = useState<any[]>([]);
+  useEffect(() => {
+    getBooks().then(setBooks);
+  }, [
+    // This effect runs only once on first component render
+    // so we declare it as having no dependent state.
+  ]);
+  return (
+    <>
+      <h2>Books</h2>
+      <Books books={books} />
+    </>
+  );
+};
+
+export default BooksFeature;
+```
+
+You may notice we're using two new components, `Books` and `Book`. Create them with:
+
+```
+npx nx g lib ui --directory books
+npx nx g component Books --project books-ui --export
+npx nx g component Book --project books-ui --export
+```
+
+We put *presentational* components in their own UI libs. This is to prevent side-effects bleeding into them, making it easier to understand and test.
+
+We use `libs/books/ui` instead of `libs/ui` because we should only use those components in `books` context, and it's not general-purpose. 
+
+**libs/books/ui/src/lib/books/books.tsx**
+
+```
+import styled from 'styled-components';
+import { Book } from '../book/book';
+
+export interface BooksProps {
+  books: any[];
+}
+
+const StyledBooks = styled.div`
+border: 1px solid #ccc;
+border-radius: 4px;
+`;
+
+export const Books = ({ books }: BooksProps) => {
+  return (
+    <StyledBooks>
+      {books.map(book => (
+        <Book key={book.id} book={book} />
+      ))}
+    </StyledBooks>
+  );
+};
+
+export default Books;
+```
+
+**libs/books/ui/src/lib/book/book.tsx**
+
+```
+import styled from 'styled-components';
+import { Button } from '@zeroone/ui';
+
+export interface BookProps {
+  book: any;
+}
+
+const StyledBook = styled.div`
+display: flex;
+align-items: center;
+border-bottom: 1px solid #ccc;
+&:last-child {
+border-bottom: none;
+}
+> span {
+padding: 1rem 0.5rem;
+margin-right: 0.5rem;
+}
+.title {
+flex: 1;
+}
+.price {
+color: #478d3c;
+}
+`;
+
+export const Book = ({ book }: BookProps) => {
+  return (
+    <StyledBook>
+      <span className="title">
+        {book.title} by <em>{book.author}</em>
+      </span>
+      <span className="price">${book.price}</span>
+    </StyledBook>
+  );
+};
+
+export default Book;
+```
+
+Restart the server to check out our new feature in action!
+
+![](images/1%20-%208.jpg)
+
+Looks good!! 🤩
+
+Now you might realize there were a couple problems.
+
+1. `getBooks` just returns a fixed, hardcoded response (a stub) and does not call out to a backend service.
+2. We use `any` types when dealing with books data ( `getBooks` returns `any[]` and `BookProps` is `{ book: any }` ). A better way to deal with this is to enforce type definitions, to prevent bugs and generally makes developing easier :D
+  
+If you want to read about scoping and bounding modules usage with tags, read below! 
+
+<details>
+<summary><b>Enforcing Module Boundaries</b></summary>
+
+We generated our libs using `--tags` option to define a type and scope for them! They can be used to define and enforce clean separation of concerns.
+
+Open `.eslintrc.json` at the root of your workspace. You should see something like this.
+
+```
+"@nrwl/nx/enforce-module-boundaries": [
+          "error",
+          {
+            "depConstraints": [
+              {
+                "sourceTag": "*",
+                "onlyDependOnLibsWithTags": [
+                  "*"
+                ]
+              }
+            ],
+            "allow": [],
+            "enforceBuildableLibDependency": true
+          }
+        ]
+```
+
+The `depConstraints` can be used to fine-tune boundaries. It is currently set to `*` which allows anything to use everything.
+
+The `allow` array is a whitelist to omit any further checks.
+
+`enforceBuildableLibDependency` prevents importing a non-buildable lib into a buildable one.
+
+### Using Tags to Enforce Boundaries
+
+As we recall earlier, we have apps and 4 categories of libs. Let's define their boundaries.
+
+1. `Applications` should be able to depend on any libs, but not other apps.
+2. `Feature` libs can depend on any other libs.
+3. `Data-access` libs should only depend on other Data-access or Utility libs.
+4. `UI` libs can only depend on other UI or Utility libs.
+5. `Utility` libs can only depend on other Utility libs.
+
+Now, let's configure the ESLint Rule.
+
+```
+"@nrwl/nx/enforce-module-boundaries": [
+          "error",
+          {
+          "depConstraints": [
+              {
+                "sourceTag": "type:app",
+                "onlyDependOnLibsWithTags": [
+                  "type:feature",
+                  "type:ui",
+                  "type:util"
+                ]
+              },
+              {
+                "sourceTag": "type:feature",
+                "onlyDependOnLibsWithTags": [
+                  "type:feature",
+                  "type:ui",
+                  "type:util"
+                ]
+              },
+              {
+                "sourceTag": "type:data-access",
+                "onlyDependOnLibsWithTags": [
+                  "type:data-access",
+                  "type:util"
+                ]
+              },
+              {
+                "sourceTag": "type:ui",
+                "onlyDependOnLibsWithTags": [
+                  "type:ui",
+                  "type:util"
+                ]
+              },
+              {
+                "sourceTag": "type:util",
+                "onlyDependOnLibsWithTags": [
+                  "type:util"
+                ]
+              }
+            ]
+          }
+        ]
+```
+
+Also, we have a second dimension to our tags. (`--tags scope:books`) which allows separation into logical domains.
+
+If we want to add an *admin* app to manage books, we can use `--tags type:app,scope:admin`. There is likely some shared libs required by both admin and books app. To do that, we generate libs with `--tags type:ui,scope:shared`.
+
+And set boundaries like:
+- `Book` apps and libs can only depend on scope:books libs.
+- `Admin` apps and libs can only depend on scope:admin libs.
+- Any apps and libs can depend on scope:shared libs.
+
+```
+"@nrwl/nx/enforce-module-boundaries": [
+          "error",
+          {
+          ...
+          "depConstraints": [
+              {
+                "sourceTag": "type:app",
+                "onlyDependOnLibsWithTags": [
+                  "type:feature",
+                  "type:ui",
+                  "type:util"
+                ]
+              },
+          ...
+          {
+                "sourceTag": "scope:books",
+                "onlyDependOnLibsWithTags": [
+                  "scope:shared",
+                  "scope:books"
+                ]
+              },
+              {
+                "sourceTag": "scope:admin",
+                "onlyDependOnLibsWithTags": [
+                  "scope:shared",
+                  "scope:admin"
+                ]
+              },
+              {
+                "sourceTag": "scope:shared",
+                "onlyDependOnLibsWithTags": [
+                  "scope:shared"
+                ]
+              }
+            ]
+          }
+        ]
+```
+
+By forbidding cross-scope dependencies, we can prevent a feature from `admin` leaking into `books` app, and it can be safely guarded.
+
+These module boundaries are going to be needed as the workspace grows, otherwise projects **will** become unmanageable :(
+
+You can also add `platform:web, platform:node, etc.` tags if you have a multi-platform monorepo.
+
+</details>
+
+---
+
+Finally, let's commit our changes before moving on :D
+
+```
+git add .
+git commit -m 'implement books feature and link to application'
+```
+
+## Summary:
+- Libs have 4 types: `feature`, `UI`, `data-access`, and `utility`.
+- Use `nx g ...` to create libs from scratch.
+- When running `nx g ...` we can use other generators like `@nrwl/web:lib` to set up a lib from specific collection rather than the one default in `nx.json`
+- Nx can enforce module boundaries through tags inside ESLint `@nrwl/nx/enforce-module-boundaries` rule. 
 
 # Chapter 3: Working Effectively in Monorepo
 
-TODO
+We have created a `bookstore` app that lists books for users to purchase. Now we will explore how Nx helps us work effectively.
+
+## The Dependency Graph
+
+As we've seen, Nx can generate a dependecy graph. Let's look at it now! 
+
+`npx nx dep-graph`
+
+![](images/1%20-%209.jpg)
+
+You can hover over a lib or app to see its dependencies. Neat, right? 
+
+## Only recompute affected projects
+
+Let's say we add a checkout button to each books in the list. Let's update our `Book`, `Books`, and `BooksFeature` components.
+
+**libs/books/ui/src/lib/book/book.tsx**
 
 # Chapter 4: Bringing it all together
 

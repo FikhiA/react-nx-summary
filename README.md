@@ -127,7 +127,7 @@ Targets are tasks or commands that can be invoked or ran on the project. Call it
 
 For example, in our `bookstore` app, we can run these targets.
 
-```
+```sh
 # Serve the app
 npx nx serve bookstore
 
@@ -194,7 +194,7 @@ Let's end this chapter by removing the generated content from the `bookstore` ap
 Open up your favorite code editor and modify these three files.
 
 **apps/bookstore/src/app/app.tsx**
-```
+```js
 import styled from 'styled-components';
 
 const StyledApp = styled.div``;
@@ -213,7 +213,7 @@ export default App;
 ```
 
 **apps/bookstore/src/app/app.spec.tsx**
-```
+```js
 import { getGreeting } from '../support/app.po';
 
 describe('bookstore', () => {
@@ -226,7 +226,7 @@ describe('bookstore', () => {
 ```
 
 **apps/bookstore-e2e/src/integration/app.spec.ts**
-```
+```js
 import { getGreeting } from '../support/app.po';
 
 describe('bookstore', () => {
@@ -251,7 +251,7 @@ It's a bookstore alright. Might not look great, but hey, you made some progress!
 
 Also, it's a good idea to commit your code before making any more changes. So you can keep track of your progress and can rollback if anything goes south :D
 
-```
+```sh
 git add .
 git commit -m 'end of chapter one'
 ```
@@ -278,7 +278,7 @@ As alluded to before, a typical Nx workspace contains "apps" and "libs". This se
 
 Nx helps you create TypeScript mappings for libraries, so using it is as simple as usual libs, without any `../../../../` kerfuffle :)
 
-```
+```js
 // Example of importing a Button from custom libs
 import { Button } from '@zeroone/ui'
 ```
@@ -345,7 +345,7 @@ You can generate new apps, components, libs, and more using `nx generate` or its
 
 So, let's try creating one!
 
-```
+```sh
 npx nx g lib feature \
 --directory books \
 --appProject bookstore \
@@ -383,7 +383,7 @@ After it completes, you will see the new directory.
 
 Nx generates our library with some default code and its scaffolding for linting (ESLint) and testing (Jest). Try running them with
 
-```
+```sh
 npx nx lint books-feature
 npx nx test books-feature
 ```
@@ -395,7 +395,7 @@ Anyway, Nx also updates the `bookstore`'s App component in `apps/bookstore/src/a
 <details>
 <summary><b>apps/bookstore/src/app/app.tsx</b></summary>
 
-```
+```js
 import styled from 'styled-components';
 
 import { Route, Link } from 'react-router-dom';
@@ -466,7 +466,7 @@ The `main.tsx` is updated as well!
 <details>
 <summary><b>apps/bookstore/src/main.tsx</b></summary>
 
-```
+```js
 import { StrictMode } from 'react';
 import * as ReactDOM from 'react-dom';
 
@@ -500,7 +500,7 @@ Uhhhh alright, it has some style to it. Not good enough though. So let's add a c
 
 ## UI Libraries
 
-```
+```sh
 npx nx g lib ui \
 --tags type:ui,scope:books \
 --no-interactive
@@ -530,7 +530,7 @@ zeroone
 
 It does nothing yet, so let's add some components!
 
-```
+```sh
 npx nx g component GlobalStyles --project ui --export --tags type:ui,scope:books
 
 npx nx g component Button --project ui --export --tags type:ui,scope:books
@@ -560,7 +560,7 @@ This component will inject a global stylesheet (css) into the app when used. Can
 
 **libs/ui/src/lib/global-styles/global-styles.tsx**
 
-```
+```js
 import { createGlobalStyle } from 'styled-components';
 
 export const GlobalStyles = createGlobalStyle`
@@ -584,7 +584,7 @@ It's a styled button. It does what it says and passes props down to the actual \
 
 **libs/ui/src/lib/button/button.tsx**
 
-```
+```js
 import { ButtonHTMLAttributes } from 'react';
 import styled from 'styled-components';
 
@@ -617,7 +617,7 @@ These are used for layout. Header component is the header bar, and the Main take
 
 **libs/ui/src/lib/header/header.tsx**
 
-```
+```js
 import { HTMLAttributes } from 'react';
 import styled from 'styled-components';
 
@@ -650,7 +650,7 @@ export default Header;
 
 **libs/ui/src/lib/main/main.tsx**
 
-```
+```js
 import { HTMLAttributes } from 'react';
 import styled from 'styled-components';
 
@@ -673,7 +673,7 @@ And lastly, NavigationList will render the navbar inside Header component, and N
 
 **libs/ui/src/lib/navigation-list/navigation-list.tsx**
 
-```
+```js
 import { HTMLAttributes } from 'react';
 import styled from 'styled-components';
 
@@ -699,7 +699,7 @@ export default NavigationList;
 
 **libs/ui/src/lib/navigation-item/navigation-item.tsx**
 
-```
+```js
 import { LiHTMLAttributes } from 'react';
 import styled from 'styled-components';
 
@@ -718,7 +718,7 @@ export default NavigationItem;
 
 Now we can use the libs inside our `bookstore` app.
 
-```
+```js
 import { Link, Redirect, Route } from 'react-router-dom';
 import { BooksFeature } from '@zeroone/books/feature';
 
@@ -760,7 +760,7 @@ Finally, let's restart our server (`npx nx serve bookstore`) and we will see the
 
 Looks great! Let's save our progress.
 
-```
+```sh
 git add .
 git commit -m 'add books feature and ui components'
 ```
@@ -783,7 +783,7 @@ Let's open and edit the books-data-access.tsx file.
 
 **libs/books/data-access/src/lib/books-data-access.ts**
 
-```
+```js
 export async function getBooks() {
   // TODO: We'll wire this up to an actual API later.
   // For now we are just returning some fixtures.
@@ -835,7 +835,7 @@ Now let's use the `getBooks` function in out `books` feature. We can do this usi
 
 **libs/books/feature/src/lib/books-feature.tsx**
 
-```
+```js
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { getBooks } from '@zeroone/books/data-access';
@@ -862,7 +862,7 @@ export default BooksFeature;
 
 You may notice we're using two new components, `Books` and `Book`. Create them with:
 
-```
+```sh
 npx nx g lib ui --directory books
 npx nx g component Books --project books-ui --export
 npx nx g component Book --project books-ui --export
@@ -874,7 +874,7 @@ We use `libs/books/ui` instead of `libs/ui` because we should only use those com
 
 **libs/books/ui/src/lib/books/books.tsx**
 
-```
+```js
 import styled from 'styled-components';
 import { Book } from '../book/book';
 
@@ -902,7 +902,7 @@ export default Books;
 
 **libs/books/ui/src/lib/book/book.tsx**
 
-```
+```js
 import styled from 'styled-components';
 import { Button } from '@zeroone/ui';
 
@@ -963,7 +963,7 @@ We generated our libs using `--tags` option to define a type and scope for them!
 
 Open `.eslintrc.json` at the root of your workspace. You should see something like this.
 
-```
+```json
 "@nrwl/nx/enforce-module-boundaries": [
           "error",
           {
@@ -999,7 +999,7 @@ As we recall earlier, we have apps and 4 categories of libs. Let's define their 
 
 Now, let's configure the ESLint Rule.
 
-```
+```json
 "@nrwl/nx/enforce-module-boundaries": [
           "error",
           {
@@ -1054,7 +1054,7 @@ And set boundaries like:
 - `Admin` apps and libs can only depend on scope:admin libs.
 - Any apps and libs can depend on scope:shared libs.
 
-```
+```json
 "@nrwl/nx/enforce-module-boundaries": [
           "error",
           {
@@ -1106,7 +1106,7 @@ You can also add `platform:web, platform:node, etc.` tags if you have a multi-pl
 
 Finally, let's commit our changes before moving on :D
 
-```
+```sh
 git add .
 git commit -m 'implement books feature and link to application'
 ```
@@ -1137,7 +1137,7 @@ Let's say we add a checkout button to each books in the list. Let's update our `
 
 **libs/books/ui/src/lib/book/book.tsx**
 
-```
+```js
 import styled from 'styled-components';
 import { Button } from '@zeroone/ui';
 
@@ -1192,7 +1192,7 @@ export default Book;
 
 **libs/books/ui/src/lib/books/books.tsx**
 
-```
+```js
 import styled from 'styled-components';
 import { Book } from '../book/book';
 
@@ -1223,7 +1223,7 @@ export default Books;
 
 **libs/books/feature/src/lib/books-feature.tsx**
 
-```
+```js
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { getBooks } from '@zeroone/books/data-access';
@@ -1262,7 +1262,7 @@ Any projects dependent on the change is highlighted in red. Welp, i think i chan
 
 But there is **more**. We can also use other commands only against the affected projects. So we can only re-test, re-lint or re-build what's changed.
 
-```
+```sh
 // build only the affected apps
 npx nx affected:build
 // run unit tests on affected projects
@@ -1311,7 +1311,7 @@ Basically, if somebody else fails a unit test on the same code.. you will also f
 
 Now let's get practical again. Commit your changes because it's about to get real. 
 
-```
+```sh
 git add .
 git commit -m 'added checkout button'
 ```
@@ -1324,7 +1324,7 @@ Install the `@nrwl/express` collection first.
 
 Then, run it!
 
-```
+```sh
 npx nx g @nrwl/express:app api \
 --no-interactive \
 --frontend-project=bookstore \
@@ -1344,7 +1344,7 @@ Nice, it works! Let's implement `/api/books` to use it in our data-access lib.
 
 **apps/api/src/main.ts**
 
-```
+```js
 /**
  * This is not a production server yet!
  * This is only a minimal backend to get started.
@@ -1426,7 +1426,7 @@ And let's update our data-access lib.
 
 **libs/books/data-access/src/lib/books-data-access.ts**
 
-```
+```js
 import { IBook } from '@zeroone/shared-models';
 
 export async function getBooks() {
@@ -1450,7 +1450,7 @@ We will see that our app still works! (hopefully...) and we can verify that `/ap
 
 Commit it because it works!
 
-```
+```sh
 git add .
 git commit -m 'added api app'
 ```
@@ -1465,7 +1465,7 @@ A better idea is to create a utility lib with shared models!
 
 **libs/shared-models/src/lib/shared-models.ts**
 
-```
+```js
 export interface IBook {
   id: number;
   title: string;
@@ -1479,7 +1479,7 @@ And change these five files to use the new model:
 
 **apps/api/src/main.ts**
 
-```
+```js
 import { IBook } from '@acme/shared-models';
 // ...
 
@@ -1495,7 +1495,7 @@ app.get('/api/books', (req, res) => {
 
 **libs/books/data-access/src/lib/books-data-access.ts**
 
-```
+```js
 import { IBook } from '@acme/shared-models';
 
 // Add correct type for the return value
@@ -1507,7 +1507,7 @@ export async function getBooks(): Promise<IBook[]> {
 
 **libs/books/feature/src/lib/books-feature.tsx**
 
-```
+```js
 // ...
 import { IBook } from '@acme/shared-models';
 
@@ -1528,7 +1528,7 @@ export default BooksFeature;
 
 **libs/books/ui/src/lib/books/books.tsx**
 
-```
+```js
 // ...
 import { IBook } from '@acme/shared-models';
 // Replace any with IBook
@@ -1544,7 +1544,7 @@ export default Books;
 
 **libs/books/ui/src/lib/book/book.tsx**
 
-```
+```js
 // ...
 import { IBook } from '@acme/shared-models';
 
@@ -1569,7 +1569,7 @@ Using Nx, we created a shared model lib and refactored both sides blazingly fast
 
 Anyway, we can also check these changes in a single commit!
 
-```
+```sh
 git add .
 git commit -m 'add shared models'
 ```
@@ -1578,11 +1578,11 @@ git commit -m 'add shared models'
 
 You can waste hours fighting over what style to use in a code. To not waste time, we use Prettier to enforce code styles, automatically. Nx uses Prettier from the get-go.
 
-```
-// Checks for format conformance with Prettier.
-// Exits with error code when the check fails.
+```sh
+# Checks for format conformance with Prettier.
+# Exits with error code when the check fails.
 nx format:check
-// Formats files with Prettier.
+# Formats files with Prettier.
 nx format:write
 ```
 
@@ -1599,14 +1599,615 @@ We have seen how to generate and organize our React apps, libs, and Express app.
 
 ## Checkout API and Shared Models
 
+Let's add shared models for our shopping cart.
+
+**libs/shared-models/src/lib/shared-models.ts**
+
+```js
+// ...
+
+export interface ICartItem {
+  id: number;
+  description: string;
+  cost: number;
+}
+
+export interface ICart {
+  items: ICartItem[];
+}
+```
+
+Next, add a checkout endpoint to the API.
+
+**apps/api/src/main.ts**
+
+```js
+import { IBook, ICart } from '@zeroone/shared-models';
+// ...
+
+app.post('/api/checkout', (req, res) => {
+  const cart: ICart = req.body;
+  console.log('Checking out...', JSON.stringify(cart, null, 2));
+  res.send({ order: '12345678' });
+});
+
+// ...
+```
+
+This doesn't do anything, really. Just logs and gives a fake order number.
+
 ## Cart data-access Lib
+
+Now add our shopping cart data-access lib to the frontend app.
+
+`npx nx g @nrwl/web:lib data-access --directory=cart`
+
+And then provide a `checkout` function to use in our feature.
+
+**libs/cart/data-access/src/lib/cart-data-access.ts**
+
+```js
+import { ICart } from '@acme/shared-models';
+
+export async function checkout(cart: ICart): Promise<{ sucess: boolean }> {
+  const data = await fetch('/api/checkout', {
+    method: 'POST',
+    headers: {
+    'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(cart),
+  });
+  return data.json();
+}
+```
 
 ## Managing cart State using Redux Toolkit
 
-I don't really understand this. So may god help you.
+The cart state may contain multiple sub-values (items, status flag, etc) and need to communicate with API endpoint. To manage this complexity, we use Redux Toolkit!
+
+*(I don't really understand this. So if anything fails, may god help you)*
+
+`npx nx g redux cart --project=cart-data-access --appProject=bookstore`
+
+We create a new Redux slice `cart` in `cart-data-access` lib. We will see `apps/bookstore/src/main.tsx` like this:
+
+<details>
+<summary><b>apps/bookstore/src/main.tsx</b></summary>
+
+```js
+/ ...
+import { configureStore, getDefaultMiddleware } from '@reduxjs/toolkit';
+import { Provider } from 'react-redux';
+import { CART_FEATURE_KEY, cartReducer } from '@zeroone/cart/data-access';
+const store = configureStore({
+  reducer: { [CART_FEATURE_KEY]: cartReducer },
+  // Additional middleware can be passed to this array
+  middleware: [...getDefaultMiddleware()],
+  devTools: process.env.NODE_ENV !== 'production',
+  // Optional Redux store enhancers
+  enhancers: [],
+});
+ReactDOM.render(
+  <Provider store={store}>
+    <React.StrictMode>
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </React.StrictMode>
+  </Provider>,
+  document.getElementById('root')
+);
+```
+
+</details>
+
+---
+
+Awesome, we didn't have to set up anything to use Redux! Let's see the slice itself.
+
+<details>
+<summary><b>libs/cart/data-access/src/lib/cart.slice.ts [LONG!]</b></summary>
+
+```js
+import {
+  createAsyncThunk,
+  createEntityAdapter,
+  createSelector,
+  createSlice,
+  EntityState,
+  PayloadAction,
+} from '@reduxjs/toolkit';
+export const CART_FEATURE_KEY = 'cart';
+/*
+* Update these interfaces according to your requirements.
+*/
+export interface CartEntity {
+  id: number;
+}
+export interface CartState extends EntityState<CartEntity> {
+  loadingStatus: 'not loaded' | 'loading' | 'loaded' | 'error';
+  error: string;
+}
+export const cartAdapter = createEntityAdapter<CartEntity>();
+/**
+* Export an effect using createAsyncThunk from
+* the Redux Toolkit: https://redux-toolkit.js.org/api/createAsyncThunk
+*
+* e.g.
+* \```
+* import { useEffect } from 'react';
+* import { useDispatch } from 'react-redux';
+*
+* // ...
+*
+* const dispatch = useDispatch();
+* useEffect(() => {
+* dispatch(fetchCart())
+* }, [dispatch]);
+* \```
+*/
+export const fetchCart = createAsyncThunk(
+  'cart/fetchStatus',
+  async (_, thunkAPI) => {
+    /**
+    * Replace this with your custom fetch call.
+    * For example, `return myApi.getCarts()`;
+    * Right now we just return an empty array.
+    */
+    return Promise.resolve([]);
+  }
+);
+export const initialCartState: CartState = cartAdapter.getInitialState({
+  loadingStatus: 'not loaded',
+  error: null,
+});
+export const cartSlice = createSlice({
+  name: CART_FEATURE_KEY,
+  initialState: initialCartState,
+  reducers: {
+    add: cartAdapter.addOne,
+    remove: cartAdapter.removeOne,
+    // ...
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchCart.pending, (state: CartState) => {
+        state.loadingStatus = 'loading';
+      })
+      .addCase(
+        fetchCart.fulfilled,
+        (state: CartState, action: PayloadAction<CartEntity[]>) => {
+          cartAdapter.setAll(state, action.payload);
+          state.loadingStatus = 'loaded';
+        }
+      )
+      .addCase(fetchCart.rejected, (state: CartState, action) => {
+        state.loadingStatus = 'error';
+        state.error = action.error.message;
+      });
+  },
+});
+/*
+* Export reducer for store configuration.
+*/
+export const cartReducer = cartSlice.reducer;
+/*
+* Export action creators to be dispatched. For use with the `useDispatch` ho\
+ok.
+*
+* e.g.
+* \```
+* import { useEffect } from 'react';
+* import { useDispatch } from 'react-redux';
+*
+* // ...
+*
+* const dispatch = useDispatch();
+* useEffect(() => {
+* dispatch(cartActions.add({ id: 1 }))
+* }, [dispatch]);
+* \```
+*
+* See: https://react-redux.js.org/next/api/hooks#usedispatch
+*/
+export const cartActions = cartSlice.actions;
+/*
+* Export selectors to query state. For use with the `useSelector` hook.
+*
+* e.g.
+* \```
+* import { useSelector } from 'react-redux';
+*
+* // ...
+*
+* const entities = useSelector(selectAllCart);
+* \```
+*
+* See: https://react-redux.js.org/next/api/hooks#useselector
+*/
+const { selectAll, selectEntities } = cartAdapter.getSelectors();
+export const getCartState = (rootState: unknown): CartState =>
+  rootState[CART_FEATURE_KEY];
+export const selectAllCart = createSelector(getCartState, selectAll);
+export const selectCartEntities = createSelector(getCartState, selectEntities\
+);
+```
+
+</details>
+
+---
+
+If you're not familiar with Redux Toolkit, you'll notice a few utilites:
+
+1. `createEntityAdapter` function returns a set of case reducers and selectors that makes working with normalized entities much simpler.
+2. `createAsyncThunk` function returns a thunk that allows us to handle async dataflow.
+3. `createSlice` function removes much of the boilerplate of Redux by allowing us to define the actions and case reducers together.
+4. The case reducers–either the reducer methods, or builder.addCase in extraReducers–
+mutate the state rather than working with it immutably. Redux Toolkit affords the ability to perform mutatable operations because it wraps the
+reducer around immer.
+
+I don't know what all that means, but let's update the slice!
+
+**libs/cart/data-access/src/lib/cart.slice.ts**
+
+```js
+import {
+  createAsyncThunk,
+  createEntityAdapter,
+  createSelector,
+  createSlice,
+  EntityState,
+} from '@reduxjs/toolkit';
+
+import { ICartItem } from '@zeroone/shared-models';
+import { checkout } from './cart-data-access';
+
+export const CART_FEATURE_KEY = 'cart';
+export interface CartState extends EntityState<ICartItem> {
+  cartStatus: 'ready' | 'pending' | 'ordered' | 'error';
+  error: string | undefined;
+  order?: string;
+}
+export const cartAdapter = createEntityAdapter<ICartItem>();
+export const checkoutCart = createAsyncThunk<{ order: string }, ICartItem[]>(
+  'cart/checkoutStatus',
+  (items) => checkout({ items })
+);
+export const initialCartState: CartState = cartAdapter.getInitialState({
+  cartStatus: 'ready',
+  error: undefined,
+});
+export const cartSlice = createSlice({
+  name: CART_FEATURE_KEY,
+  initialState: initialCartState,
+  reducers: {
+    add: cartAdapter.addOne,
+    remove: cartAdapter.removeOne,
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(checkoutCart.pending, (state: CartState) => {
+        state.cartStatus = 'pending';
+      })
+      .addCase(checkoutCart.fulfilled, (state: CartState, action) => {
+        state.order = action.payload.order;
+        state.cartStatus = 'ordered';
+      })
+      .addCase(checkoutCart.rejected, (state: CartState, action) => {
+        state.cartStatus = 'error';
+        state.error = action.error.message;
+      });
+  },
+});
+export const cartReducer = cartSlice.reducer;
+export const cartActions = cartSlice.actions;
+const { selectAll } = cartAdapter.getSelectors();
+export const getCartState = (rootState: any): CartState =>
+  rootState[CART_FEATURE_KEY];
+export const selectCartItems = createSelector(getCartState, selectAll);
+export const selecteCartStatus = createSelector(
+  getCartState,
+  (state) => state.cartStatus
+);
+export const selectOrderNumber = createSelector(
+  getCartState,
+  (state) => state.order
+);
+export const selectTotal = createSelector(selectCartItems, (items) =>
+  items.reduce((total, item) => total + item.cost, 0)
+);
+```
 
 ## Cart feature Lib
 
+Now that the data-access is sorted out, let's add our shopping cart feature lib!
+
+`npx nx g lib feature --directory=cart --appProject=bookstore`
+
+The `--appProject` flag installs the feature as a route to the app. Nx guesses what the route should be, and adds a new `<Link>` component in the App.
+
+It guessed, but most likely.. not correctly 😂. Let's fix it.
+
+**apps/bookstore/src/app/app.tsx**
+
+```js
+import { Route, Link, Redirect } from 'react-router-dom';
+import { BooksFeature } from '@zeroone/books/feature';
+import {
+  GlobalStyles,
+  Header,
+  Main,
+  NavigationItem,
+  NavigationList,
+} from '@zeroone/ui';
+import { CartFeature } from '@zeroone/cart/feature';
+
+export const App = () => {
+  return (
+    <>
+      <GlobalStyles />
+      <Header>
+        <h1>Bookstore</h1>
+        <NavigationList>
+          <NavigationItem>
+            <Link to="/books">Books</Link>
+          </NavigationItem>
+          <NavigationItem>
+            <Link to="/cart">Cart</Link>
+          </NavigationItem>
+        </NavigationList>
+      </Header>
+      <Main>
+        <Route path="/books" component={BooksFeature} />
+        <Route path="/cart" component={CartFeature} />
+        <Route exact path="/" render={() => <Redirect to="/books" />} />
+      </Main>
+    </>
+  );
+};
+
+export default App;
+```
+
+Let's implement `CartFeature` component. We'll keep it within the following:
+
+1. Display each added cart item.
+2. Provide a button to remove an item.
+3. Show the total cost of all items.
+4. Provide a button to checkout (i.e. call the checkout API).
+5. Display a success message when the API returns successfully.
+
+This should do.
+
+**libs/cart/feature/src/lib/cart-feature.tsx**
+
+```js
+import styled from 'styled-components';
+import { Button } from '@zeroone/ui';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+  cartActions,
+  selectCartItems,
+  selecteCartStatus,
+  selectOrderNumber,
+  selectTotal,
+  checkoutCart,
+} from '@zeroone/cart/data-access';
+
+const StyledCartFeature = styled.div`
+.item {
+display: flex;
+align-items: center;
+padding-bottom: 9px;
+margin-bottom: 9px;
+border-bottom: 1px #ccc solid;
+}
+.description {
+flex: 1;
+}
+.cost {
+width: 10%;
+}
+.action {
+width: 10%;
+}
+`;
+
+export const CartFeature = () => {
+  const dispatch = useDispatch();
+  const cartItems = useSelector(selectCartItems);
+  const status = useSelector(selecteCartStatus);
+  const order = useSelector(selectOrderNumber);
+  const total = useSelector(selectTotal);
+  const cartIsEmpty = cartItems.length === 0;
+  return (
+    <StyledCartFeature>
+      <h1>My Cart</h1>
+      {order ? (<p>Thank you for ordering. Your order number is <strong>#{order}</strong>.</p>) :
+        (
+          <>
+            {cartIsEmpty ? <p>Your cart is empty</p> : null}
+            <div>
+              {cartItems.map((item) => (
+                <div className="item" key={item.id}>
+                  <span className="description">{item.description}</span>
+                  <span className="cost">${item.cost.toFixed(2)}</span>
+                  <span className="action">
+                    <Button onClick={() => dispatch(cartActions.remove(item.id))}>
+                      Remove
+                    </Button>
+                  </span>
+                </div>
+              ))}
+            </div>
+            <p>Total: ${total.toFixed(2)}</p>
+            <Button
+              disabled={cartIsEmpty || status !== 'ready'}
+              onClick={() => dispatch(checkoutCart(cartItems))}
+            >
+              Checkout
+            </Button>
+          </>
+        )
+      }
+    </StyledCartFeature >
+  );
+};
+export default CartFeature;
+```
+
+Notice that we can dispatch the generated `cartActions` as well as the async thunk `checkoutCart` through the Redux store.
+
 ## Wiring up Add Button in books Feature
 
+We previously used `alert` when users clicked the *Add* button. Let's update `BooksFeature` as follows.
+
+**libs/cart/feature/src/lib/books-feature.tsx**
+
+```js
+import { useEffect, useState } from 'react';
+import styled from 'styled-components';
+import { getBooks } from '@zeroone/books/data-access';
+import { Books } from '@zeroone/books/ui';
+import { IBook } from '@zeroone/shared-models';
+import { useDispatch } from 'react-redux';
+import { cartActions } from '@zeroone/cart/data-access';
+
+export const BooksFeature = () => {
+  const [books, setBooks] = useState<IBook[]>([]);
+  const dispatch = useDispatch();
+  useEffect(() => {
+    getBooks().then(setBooks);
+  }, []);
+  return (
+    <>
+      <h2>Books</h2>
+      <Books
+        books={books}
+        onAdd={(book) =>
+          // Using add action from cart slice
+          dispatch(
+            cartActions.add({
+              id: book.id,
+              description: book.title,
+              cost: book.price,
+            })
+          )
+        }
+      />
+    </>
+  );
+};
+
+export default BooksFeature;
+```
+
+Now run both apps.
+
+```sh
+# Run these in different terminal windows
+nx serve api
+nx serve bookstore
+```
+
+Open up [http://localhost:4200](http://localhost:4200) and see it in action!
+
+Main Page
+
+![](images/1%20-%2015.jpg)
+
+Cart Page
+
+![](images/1%20-%2016.jpg)
+
+Checkout Page
+
+![](images/1%20-%2017.jpg)
+
+Looks good! If you do get stuck, you can refer to the solution repo: 
+[https://github.com/nrwl/nx-react-book-example](https://github.com/nrwl/nx-react-book-example)
+
+Congrats on making it this far! Now is a good time to save your progress!
+
+```sh
+git add .
+git commit -m 'add cart feature'
+```
+
 ## Building for Production
+
+Now that we have completed our features, we can build the frontend and backend for production.
+
+```sh
+npx nx build api
+npx nx build bookstore
+```
+
+or use `npx nx run-many --target=build --projects=api,bookstore`.
+
+When both succeeded, you will see the output in `dist` folder.
+
+```
+dist
+└── apps
+  ├── api
+  │ ├── assets
+  │ ├── main.js
+  │ └── main.js.map
+  └── bookstore
+    ├── 3rdpartylicenses.txt
+    ├── assets
+    ├── favicon.ico
+    ├── index.html
+    ├── main.fc726d4f52fe3ea5.esm.js
+    ├── main.fc726d4f52fe3ea5.esm.js.LICENSE.txt
+    ├── polyfills.7e0034cfe0406d00.esm.js
+    └── runtime.bdc91b7b4b12a0bf.esm.js
+```
+
+You can run the backend with Node, and the frontend with any static file server hosting!
+
+```sh
+# Run the backend
+node dist/apps/main.js
+
+# Run the frontend
+npx serve dist/apps/bookstore
+```
+
+You may notice that `/api` is not available from the frontend. To solve this, we will just serve the frontend through the API server.
+
+**apps/api/src/main.ts**
+
+```js
+// ...
+
+const port = process.env.port || 3333;
+const server = app.listen(port, () => {
+console.log(`Listening at http://localhost:${port}/api`);
+});
+
+// Serve built frontend app
+app.use(express.static(path.join(__dirname, '../bookstore')))
+// Handle browser-side routes
+app.get('*', function(req, res) {
+  res.sendFile('index.html', {root: path.join(__dirname, '../bookstore')});
+});
+
+server.on('error', console.error);
+```
+
+Now rebuild the API and serve.
+
+```sh
+npx nx build api
+node dist/apps/api/main.js
+```
+
+Open up [http://localhost:3333](http://localhost:3333) and you will see it running in production mode! Yeayy! 🥳🎉
+
+![](images/1%20-%2018.jpg)
+
+This is the end of "Effective React Development with Nx" Summary. Thank you for following me into this awesome journey!
+
+Hit me up if there is anything i did wrong or should improve!

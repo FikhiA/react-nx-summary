@@ -2,6 +2,47 @@
 
 ![](images/nx-react.jpg)
 
+# Table of Contents
+
+- [Effective React Development with Nx](#effective-react-development-with-nx)
+- [Table of Contents](#table-of-contents)
+- [Introduction](#introduction)
+- [Chapter 1: Getting Started with Nx](#chapter-1-getting-started-with-nx)
+  - [Creating a Nx workspace](#creating-a-nx-workspace)
+  - [Nx Commands](#nx-commands)
+  - [Preparing for Development](#preparing-for-development)
+  - [Summary:](#summary)
+- [Chapter 2: Libraries](#chapter-2-libraries)
+  - [Apps and Libs](#apps-and-libs)
+  - [Organizing Libraries](#organizing-libraries)
+  - [Categories of Libraries](#categories-of-libraries)
+  - [Feature Libs](#feature-libs)
+  - [UI Libraries](#ui-libraries)
+  - [GlobalStyles](#globalstyles)
+  - [Button](#button)
+  - [Header and Main](#header-and-main)
+  - [NavigationList and NavigationItem](#navigationlist-and-navigationitem)
+  - [Using the UI Libs](#using-the-ui-libs)
+  - [Data-access Libs](#data-access-libs)
+  - [Using the data-access lib](#using-the-data-access-lib)
+  - [Summary:](#summary-1)
+- [Chapter 3: Working Effectively in Monorepo](#chapter-3-working-effectively-in-monorepo)
+  - [The Dependency Graph](#the-dependency-graph)
+  - [Only recompute affected projects](#only-recompute-affected-projects)
+  - [Computation Caching](#computation-caching)
+  - [Adding the API App](#adding-the-api-app)
+  - [Sharing Models between Frontend and Backend](#sharing-models-between-frontend-and-backend)
+  - [Automatic Code Formatting](#automatic-code-formatting)
+  - [Summary:](#summary-2)
+- [Chapter 4: Bringing it all together](#chapter-4-bringing-it-all-together)
+  - [Checkout API and Shared Models](#checkout-api-and-shared-models)
+  - [Cart data-access Lib](#cart-data-access-lib)
+  - [Managing cart State using Redux Toolkit](#managing-cart-state-using-redux-toolkit)
+  - [Cart feature Lib](#cart-feature-lib)
+  - [Wiring up Add Button in books Feature](#wiring-up-add-button-in-books-feature)
+  - [Building for Production](#building-for-production)
+
+
 # Introduction
 When working at a company with more than one team, most of the times development teams are grouped by their domain or technology. 
 For example, one team builds UI in React, and another one builds API in Express. 
@@ -987,7 +1028,7 @@ The `allow` array is a whitelist to omit any further checks.
 
 `enforceBuildableLibDependency` prevents importing a non-buildable lib into a buildable one.
 
-### Using Tags to Enforce Boundaries
+**Using Tags to Enforce Boundaries**
 
 As we recall earlier, we have apps and 4 categories of libs. Let's define their boundaries.
 
@@ -1263,17 +1304,17 @@ Any projects dependent on the change is highlighted in red. Welp, i think i chan
 But there is **more**. We can also use other commands only against the affected projects. So we can only re-test, re-lint or re-build what's changed.
 
 ```sh
-// build only the affected apps
+# build only the affected apps
 npx nx affected:build
-// run unit tests on affected projects
+# run unit tests on affected projects
 npx nx affected:test
-// run linting on affected projects
+# run linting on affected projects
 npx nx affected:lint
-// run e2e tests on affected projects
+# run e2e tests on affected projects
 npx nx affected:e2e
-// Lists affected apps
+# Lists affected apps
 npx nx affected:apps
-// Lists affected libs
+# Lists affected libs
 npx nx affected:libs
 ```
 
